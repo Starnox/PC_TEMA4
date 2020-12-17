@@ -1,8 +1,5 @@
 #include "utils.h"
 
-#define LENGHT 1000
-#define BOARD_SIZE 50005
-
 void* (* Abilities[4])(void* x) = {RotateMatrix, DecodeString, InvertArray, KillPlayer};
 
 char *fromEnumtoString(PlayerRoles playerRole)
@@ -26,12 +23,14 @@ char *fromEnumtoString(PlayerRoles playerRole)
 	return str;
 }
 
+
+
 // Task 1
 void *RotateMatrix(void *input)
 {
 	// Declaring and initialising
 	int i, j, n = *((int *) input);
-	char *board = malloc(BOARD_SIZE * sizeof(char)), buffer[LENGHT];
+	char *board = malloc(MAX_LEN_STR_OUT * sizeof(char)), buffer[MAX_LEN_STR_LOC];
 
 	// verifying
 	if(board == NULL)
@@ -62,7 +61,7 @@ void *RotateMatrix(void *input)
 // Task 2
 void *DecodeString(void *input)
 {
-	char string[LENGHT], *buffer = malloc(LENGHT * sizeof(char));
+	char string[MAX_LEN_STR_LOC], *buffer = malloc(MAX_LEN_STR_LOC * sizeof(char));
 
 	if(buffer == NULL)
 	{
@@ -99,7 +98,8 @@ void *InvertArray(void *input)
 {
 	// convert from void* to int*
 	int *v = (int *) input, i = 1;
-	char *res = malloc(LENGHT * sizeof(char)), buffer[LENGHT];
+	char *res = malloc(MAX_LEN_STR_LOC * sizeof(char)), 
+			buffer[MAX_LEN_STR_LOC];
 	if(res == NULL)
 	{
 		return NULL;
@@ -134,32 +134,121 @@ void *InvertArray(void *input)
 	return ((void *) res);
 }
 
+
+void selectRole(Player *player,char *playerRole)
+{	
+	if(strcmp(playerRole,"Rotator") == 0){
+		player->playerRole = Rotator;
+		player->ability = RotateMatrix;
+	}
+	else if(strcmp(playerRole,"Decoder") == 0)
+	{
+		player->playerRole = Decoder;
+		player->ability = DecodeString;
+	}
+	else if(strcmp(playerRole,"Invertor") == 0)
+	{
+		player->playerRole = Invertor;
+		player->ability = InvertArray;
+	}
+	else
+	{
+		player->playerRole = Impostor;
+		player->ability = KillPlayer;
+	}
+	
+}
+
 //Task 4
 Player *allocPlayer()
 {
-	// TODO
-	return NULL;
+	Player *myPlayer = malloc(sizeof(Player));
+	if(myPlayer == NULL)
+		return NULL;
+	myPlayer->name = malloc(MAX_LEN_STR_ATR * sizeof(char));
+	myPlayer->color = malloc(MAX_LEN_STR_ATR * sizeof(char));
+	myPlayer->hat = malloc(MAX_LEN_STR_ATR * sizeof(char));
+	myPlayer->alive = 1;
+	return myPlayer;
 }
 
 //Task 4
 Game *allocGame()
 {
-	// TODO
-	return NULL;
+	Game *myGame = malloc(sizeof(myGame));
+	if(myGame == NULL)
+		return NULL;
+	myGame->name = malloc(MAX_LEN_STR_ATR * sizeof(char));
+	return myGame;
 }
 
 //Task 5
 Player *ReadPlayer(FILE *inputFile)
 {
-	// TODO
-	return NULL;
+	Player *myPlayer = allocPlayer();
+	if(myPlayer == NULL)
+	{
+		return NULL;
+	}
+
+	char playerName[MAX_LEN_STR_ATR], color[MAX_LEN_STR_ATR],
+		hat[MAX_LEN_STR_ATR], playerRole[MAX_LEN_STR_ATR];
+
+	int numOfLocations, i;
+	Location myLocation;
+	
+	fscanf(inputFile,"%s\n",playerName);
+	fscanf(inputFile,"%s\n",color);
+	fscanf(inputFile,"%s\n",hat);
+	fscanf(inputFile,"%d\n",&numOfLocations);
+
+	strcpy(myPlayer->name,playerName);
+	strcpy(myPlayer->color,color);
+	strcpy(myPlayer->hat,hat);
+	myPlayer->numberOfLocations = numOfLocations;
+	myPlayer->locations = malloc(numOfLocations * sizeof(Location));
+
+	for(i = 0; i < numOfLocations; ++i)
+	{
+		if(i != numOfLocations - 1)
+			fscanf(inputFile,"(%d,%d) ",&myLocation.x,&myLocation.y);
+		else
+			fscanf(inputFile,"(%d,%d)",&myLocation.x,&myLocation.y);
+		myPlayer->locations[i] = myLocation;
+	}
+	fscanf(inputFile,"%s",playerRole);
+	selectRole(myPlayer, playerRole);
+
+	return myPlayer;
 }
 
 // Task 5
 Game *ReadGame(FILE *inputFile)
 {
-	// TODO
-	return NULL;
+	char gameName[MAX_LEN_STR_ATR];
+	int killRange, numCrewmates, i; 
+
+	fscanf(inputFile,"%s\n",gameName);
+	fscanf(inputFile,"%d\n",&killRange);
+	fscanf(inputFile,"%d\n",&numCrewmates);
+
+	Game *myGame = allocGame();
+	strcpy(myGame->name,gameName);
+	myGame->killRange = killRange;
+	myGame->numberOfCrewmates = numCrewmates;
+
+	myGame->crewmates = malloc(numCrewmates * sizeof(Player));
+
+	for(i = 0; i < numCrewmates; ++i)
+	{
+		Player *newPlayer = ReadPlayer(inputFile);
+		myGame->crewmates[i] = newPlayer;
+	}
+
+	Player *newImpostor = ReadPlayer(inputFile);
+	myGame->impostor = newImpostor;
+	
+	return myGame;
 }
 
 // Task 6
