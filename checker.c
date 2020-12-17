@@ -288,5 +288,6 @@ int main(int argc, char *argv[])
 	free(inputFileName);
 	free(outputFileName);
 	fclose(inputFile);
+	
 	return 0;
 }

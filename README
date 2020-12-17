@@ -1,0 +1,9 @@
+# Tema 4 PC. Among Us
+
+### Elev: Mihailescu Eduard-Florin
+### Grupa: 312CB
+
+### Task1
+* `RotateMatrix(void *input)` - se aloca dinamic un sir de caractere ce va reprezenta
+sirul returnat la final, iar in doua `for`-uri se construieste fiecare element al 
+sirului prin functia `sprintf()`
