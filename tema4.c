@@ -4,7 +4,7 @@ void* (* Abilities[4])(void* x) = {RotateMatrix, DecodeString, InvertArray, Kill
 
 char *fromEnumtoString(PlayerRoles playerRole)
 {
-	char *str = calloc(MAX_LEN_STR_ATR, sizeof(char));
+	char *str = (char *)calloc(MAX_LEN_STR_ATR, sizeof(char));
 	switch(playerRole)
 	{
 		case Rotator:
@@ -30,7 +30,7 @@ void *RotateMatrix(void *input)
 {
 	// Declaring and initialising
 	int i, j, n = *((int *) input);
-	char *board = malloc(MAX_LEN_STR_OUT * sizeof(char)), buffer[MAX_LEN_STR_LOC];
+	char *board = calloc(MAX_LEN_STR_OUT, sizeof(char)), buffer[MAX_LEN_STR_LOC];
 
 	// verifying
 	if(board == NULL)
@@ -61,7 +61,7 @@ void *RotateMatrix(void *input)
 // Task 2
 void *DecodeString(void *input)
 {
-	char string[MAX_LEN_STR_LOC], *buffer = malloc(MAX_LEN_STR_LOC * sizeof(char));
+	char string[MAX_LEN_STR_LOC], *buffer = calloc(MAX_LEN_STR_LOC, sizeof(char));
 
 	if(buffer == NULL)
 	{
@@ -98,7 +98,7 @@ void *InvertArray(void *input)
 {
 	// convert from void* to int*
 	int *v = (int *) input, i = 1;
-	char *res = malloc(MAX_LEN_STR_LOC * sizeof(char)), 
+	char *res = (char *) malloc(MAX_LEN_STR_LOC * sizeof(char)), 
 			buffer[MAX_LEN_STR_LOC];
 	if(res == NULL)
 	{
@@ -162,12 +162,12 @@ void SelectRole(Player *player,char *playerRole)
 //Task 4
 Player *allocPlayer()
 {
-	Player *myPlayer = malloc(sizeof(Player));
+	Player *myPlayer = (Player *) calloc(1, sizeof(Player));
 	if(myPlayer == NULL)
 		return NULL;
-	myPlayer->name = malloc(MAX_LEN_STR_ATR * sizeof(char));
-	myPlayer->color = malloc(MAX_LEN_STR_ATR * sizeof(char));
-	myPlayer->hat = malloc(MAX_LEN_STR_ATR * sizeof(char));
+	myPlayer->name = (char *)malloc(MAX_LEN_STR_ATR * sizeof(char));
+	myPlayer->color = (char *)malloc(MAX_LEN_STR_ATR * sizeof(char));
+	myPlayer->hat = (char *)malloc(MAX_LEN_STR_ATR * sizeof(char));
 	myPlayer->alive = 1;
 	return myPlayer;
 }
@@ -175,10 +175,10 @@ Player *allocPlayer()
 //Task 4
 Game *allocGame()
 {
-	Game *myGame = malloc(sizeof(myGame));
+	Game *myGame = (Game *) calloc(1, sizeof(Game));
 	if(myGame == NULL)
 		return NULL;
-	myGame->name = malloc(MAX_LEN_STR_ATR * sizeof(char));
+	myGame->name = (char *) malloc(MAX_LEN_STR_ATR * sizeof(char));
 	return myGame;
 }
 
@@ -195,8 +195,7 @@ Player *ReadPlayer(FILE *inputFile)
 		hat[MAX_LEN_STR_ATR], playerRole[MAX_LEN_STR_ATR];
 
 	int numOfLocations, i;
-	Location myLocation;
-	
+
 	fscanf(inputFile,"%s\n",playerName);
 	fscanf(inputFile,"%s\n",color);
 	fscanf(inputFile,"%s\n",hat);
@@ -206,15 +205,14 @@ Player *ReadPlayer(FILE *inputFile)
 	strcpy(myPlayer->color,color);
 	strcpy(myPlayer->hat,hat);
 	myPlayer->numberOfLocations = numOfLocations;
-	myPlayer->locations = malloc(numOfLocations * sizeof(Location));
+	myPlayer->locations = (Location *) calloc (myPlayer->numberOfLocations, sizeof(Location *));
 
 	for(i = 0; i < numOfLocations; ++i)
 	{
 		if(i != numOfLocations - 1)
-			fscanf(inputFile,"(%d,%d) ",&myLocation.x,&myLocation.y);
+			fscanf(inputFile,"(%d,%d) ",&myPlayer->locations[i].x,&myPlayer->locations[i].y);
 		else
-			fscanf(inputFile,"(%d,%d)",&myLocation.x,&myLocation.y);
-		myPlayer->locations[i] = myLocation;
+			fscanf(inputFile,"(%d,%d)",&myPlayer->locations[i].x,&myPlayer->locations[i].y);
 	}
 	fscanf(inputFile,"%s",playerRole);
 	SelectRole(myPlayer, playerRole);
@@ -237,7 +235,7 @@ Game *ReadGame(FILE *inputFile)
 	myGame->killRange = killRange;
 	myGame->numberOfCrewmates = numCrewmates;
 
-	myGame->crewmates = malloc(numCrewmates * sizeof(Player));
+	myGame->crewmates = (Player **) calloc(numCrewmates, sizeof(Player *));
 
 	for(i = 0; i < numCrewmates; ++i)
 	{
@@ -299,20 +297,22 @@ int CalculateDistance(Player *player, Player *impostor)
 void *KillPlayer(void *input)
 {
 	Game *myGame = (Game *) input;
-	int i, minDistance = -1, newDistance;
+	int i, minDistance = -1, newDistance, killedSomeone = 0;
 	Player *selectedPlayer = NULL;
 
 	// Go through each of the crewmates
 	for(i = 0; i < myGame->numberOfCrewmates; ++i)
 	{
 		newDistance = CalculateDistance(myGame->crewmates[i], myGame->impostor);
-		if(minDistance == -1 && newDistance <= myGame->killRange){
+		if(myGame->crewmates[i]->alive == 1 && minDistance == -1 && newDistance <= myGame->killRange){
 			minDistance = newDistance;
 			selectedPlayer = myGame->crewmates[i];
+			killedSomeone = 1;
 		}
 		else
 		{
-			if(newDistance <= minDistance && newDistance <= myGame->killRange)
+			if(myGame->crewmates[i]->alive == 1 && newDistance <= minDistance 
+					&& newDistance <= myGame->killRange)
 			{
 				minDistance = newDistance;
 				selectedPlayer = myGame->crewmates[i];
@@ -320,11 +320,11 @@ void *KillPlayer(void *input)
 		}
 	}
 
-	char *result = malloc(MAX_LEN_STR_OUT * sizeof(char));
+	char *result = (char *) malloc(MAX_LEN_STR_OUT * sizeof(char));
 	if(result == NULL)
 		return NULL;
 	// If no player is in range
-	if(minDistance == -1)
+	if(minDistance == -1 || killedSomeone == 0)
 		sprintf(result,"Impostor %s couldn't kill anybody.", myGame->impostor->name);
 	else
 	{
@@ -339,20 +339,74 @@ void *KillPlayer(void *input)
 // Task 8
 void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)
 {
-	// TODO
+	int i, n = game->numberOfCrewmates;
+	Player *currentPlayer;
+	for(i = 0; i < n; ++i)
+	{
+		currentPlayer = game->crewmates[i];
+		// If the player is alive
+		if(currentPlayer->alive == 1)
+		{
+			// Update the location
+			currentPlayer->indexOfLocation = (currentPlayer->indexOfLocation + 1)
+				% currentPlayer->numberOfLocations;
+			//Player [nume_jucator] went to location ([x],[y]).[\n]
+			fprintf(outputFile,"Crewmate %s went to location (%d,%d).\n",currentPlayer->name,
+					currentPlayer->locations[currentPlayer->indexOfLocation].x,
+					currentPlayer->locations[currentPlayer->indexOfLocation].y);
+
+			fprintf(outputFile,"Crewmate %s's output:\n",currentPlayer->name);
+			fprintf(outputFile, "%s\n", (char *) currentPlayer->ability(inputMatrix[i]));
+		}
+		else
+		{
+			//Player [nume_jucator] is dead.[\n]
+			fprintf(outputFile,"Crewmate %s is dead.\n",currentPlayer->name);
+		}
+		
+	}
+	// For the impostor
+	Player *impostor = game->impostor;
+	impostor->indexOfLocation = (impostor->indexOfLocation + 1)
+				% impostor->numberOfLocations;
+	fprintf(outputFile,"Impostor %s went to location (%d,%d).\n",impostor->name,
+					impostor->locations[impostor->indexOfLocation].x,
+					impostor->locations[impostor->indexOfLocation].y);
+	fprintf(outputFile,"Impostor %s's output:\n",impostor->name);
+	fprintf(outputFile,"%s\n", (char *) KillPlayer((void *) game));
 	return;
 }
 
 // Task 9
 void FreePlayer(Player *player)
 {
-	// TODO
+	int i, n = player->numberOfLocations;
+
+	for(i = 0; i < n; ++i)
+		free(&player->locations[i]);
+	free(player->locations);
+
+	free(player->hat);
+	free(player->color);
+	free(player->name);
+	
+	free(player);
 	return;
 }
 
 // Task 9
 void FreeGame(Game *game)
 {
-	// TODO
+	int i;
+	
+	FreePlayer(game->impostor);
+	
+	for(i = 0; i < game->numberOfCrewmates; ++i)
+	{
+		FreePlayer(game->crewmates[i]);
+	}
+	free(game->crewmates);
+	free(game->name);
+	free(game);
 	return;
 }

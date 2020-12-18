@@ -276,6 +276,7 @@ int main(int argc, char *argv[])
 
 	FILE *inputFile = fopen(inputFileName, "rt");
 
+	
 	CheckTask1(inputFile, outputFileName);
 	CheckTask2(inputFile, outputFileName);
 	CheckTask3(inputFile, outputFileName);
@@ -284,6 +285,7 @@ int main(int argc, char *argv[])
 	CheckTask6(inputFile, outputFileName);
 	CheckTask7(inputFile, outputFileName);
 	CheckTask8(inputFile, outputFileName);
+	
 
 	free(inputFileName);
 	free(outputFileName);
