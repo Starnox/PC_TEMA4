@@ -254,14 +254,33 @@ Game *ReadGame(FILE *inputFile)
 // Task 6
 void WritePlayer(Player *player, FILE *outputFile)
 {
-	// TODO
+	fprintf(outputFile,"Player %s with color %s, hat %s and role %s has entered the game.\n",player->name,
+		player->color,player->hat,fromEnumtoString(player->playerRole));
+	fprintf(outputFile,"Player's locations: ");
+	for(int i = 0; i < player->numberOfLocations; ++i)
+	{
+		fprintf(outputFile,"(%d,%d) ",player->locations[i].x, player->locations[i].y);
+	}
+	fprintf(outputFile,"\n");
 	return;
 }
 
 // Task 6
 void WriteGame(Game *game, FILE *outputFile)
 {
-	// TODO
+	fprintf(outputFile,"Game %s has just started!\n",game->name);
+	fprintf(outputFile,"\tGame options:\n");
+	fprintf(outputFile,"Kill Range: %d\n",game->killRange);
+	fprintf(outputFile,"Number of crewmates: %d\n\n",game->numberOfCrewmates);
+	fprintf(outputFile,"\tCrewmates:\n");
+
+	for(int i = 0; i< game->numberOfCrewmates; ++i)
+	{
+		WritePlayer(game->crewmates[i],outputFile);
+	}
+	fprintf(outputFile,"\n");
+	fprintf(outputFile,"\tImpostor:\n");
+	WritePlayer(game->impostor,outputFile);
 	return;
 }
 
