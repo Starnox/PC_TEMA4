@@ -86,7 +86,7 @@ void *DecodeString(void *input)
 	return ((void *) buffer);
 }
 
-void swap(int *a, int *b)
+void Swap(int *a, int *b)
 {
 	int aux = *a;
 	*a = *b;
@@ -113,14 +113,14 @@ void *InvertArray(void *input)
 		for(i = 1; i < n; i+=2)
 		{
 			// swap elements (2k+1,2k+2);
-			swap(v+i, v+i+1);
+			Swap(v+i, v+i+1);
 		}
 	}
 	else
 	{
 		for(i = 1; i <= n / 2; ++i)
 		{
-			swap(v+i, v + n - i + 1);
+			Swap(v+i, v + n - i + 1);
 		}
 	}
 	for(i = 1; i <= n; ++i)
@@ -135,7 +135,7 @@ void *InvertArray(void *input)
 }
 
 
-void selectRole(Player *player,char *playerRole)
+void SelectRole(Player *player,char *playerRole)
 {	
 	if(strcmp(playerRole,"Rotator") == 0){
 		player->playerRole = Rotator;
@@ -217,7 +217,7 @@ Player *ReadPlayer(FILE *inputFile)
 		myPlayer->locations[i] = myLocation;
 	}
 	fscanf(inputFile,"%s",playerRole);
-	selectRole(myPlayer, playerRole);
+	SelectRole(myPlayer, playerRole);
 
 	return myPlayer;
 }
@@ -284,11 +284,56 @@ void WriteGame(Game *game, FILE *outputFile)
 	return;
 }
 
+int CalculateDistance(Player *player, Player *impostor)
+{
+	int playerX = player->locations[player->indexOfLocation].x,
+		playerY = player->locations[player->indexOfLocation].y,
+		impostorX = impostor->locations[impostor->indexOfLocation].x,
+		impostorY = impostor->locations[impostor->indexOfLocation].y;
+
+	return (abs(playerX - impostorX) + abs(playerY - impostorY));
+}
+
+
 //Task 7
 void *KillPlayer(void *input)
 {
-	// TODO
-	return NULL;
+	Game *myGame = (Game *) input;
+	int i, minDistance = -1, newDistance;
+	Player *selectedPlayer = NULL;
+
+	// Go through each of the crewmates
+	for(i = 0; i < myGame->numberOfCrewmates; ++i)
+	{
+		newDistance = CalculateDistance(myGame->crewmates[i], myGame->impostor);
+		if(minDistance == -1 && newDistance <= myGame->killRange){
+			minDistance = newDistance;
+			selectedPlayer = myGame->crewmates[i];
+		}
+		else
+		{
+			if(newDistance <= minDistance && newDistance <= myGame->killRange)
+			{
+				minDistance = newDistance;
+				selectedPlayer = myGame->crewmates[i];
+			}
+		}
+	}
+
+	char *result = malloc(MAX_LEN_STR_OUT * sizeof(char));
+	if(result == NULL)
+		return NULL;
+	// If no player is in range
+	if(minDistance == -1)
+		sprintf(result,"Impostor %s couldn't kill anybody.", myGame->impostor->name);
+	else
+	{
+		selectedPlayer->alive = 0;
+		sprintf(result,"Impostor %s has just killed crewmate %s from distance %d.",
+			myGame->impostor->name, selectedPlayer->name, minDistance);
+	}
+
+	return ((void *) result);
 }
 
 // Task 8
