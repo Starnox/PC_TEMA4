@@ -252,8 +252,11 @@ Game *ReadGame(FILE *inputFile)
 // Task 6
 void WritePlayer(Player *player, FILE *outputFile)
 {
+	char *playerRoleString = fromEnumtoString(player->playerRole);
 	fprintf(outputFile,"Player %s with color %s, hat %s and role %s has entered the game.\n",player->name,
-		player->color,player->hat,fromEnumtoString(player->playerRole));
+		player->color,player->hat,playerRoleString);
+
+	free(playerRoleString);
 	fprintf(outputFile,"Player's locations: ");
 	for(int i = 0; i < player->numberOfLocations; ++i)
 	{
@@ -350,13 +353,15 @@ void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)
 			// Update the location
 			currentPlayer->indexOfLocation = (currentPlayer->indexOfLocation + 1)
 				% currentPlayer->numberOfLocations;
-			//Player [nume_jucator] went to location ([x],[y]).[\n]
+			
 			fprintf(outputFile,"Crewmate %s went to location (%d,%d).\n",currentPlayer->name,
 					currentPlayer->locations[currentPlayer->indexOfLocation].x,
 					currentPlayer->locations[currentPlayer->indexOfLocation].y);
 
 			fprintf(outputFile,"Crewmate %s's output:\n",currentPlayer->name);
-			fprintf(outputFile, "%s\n", (char *) currentPlayer->ability(inputMatrix[i]));
+			char *abilityString = (char *) currentPlayer->ability(inputMatrix[i]);
+			fprintf(outputFile, "%s\n", abilityString);
+			free(abilityString);
 		}
 		else
 		{
@@ -373,17 +378,15 @@ void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)
 					impostor->locations[impostor->indexOfLocation].x,
 					impostor->locations[impostor->indexOfLocation].y);
 	fprintf(outputFile,"Impostor %s's output:\n",impostor->name);
-	fprintf(outputFile,"%s\n", (char *) KillPlayer((void *) game));
+	char *killPlayerString = (char *) KillPlayer((void *) game);
+	fprintf(outputFile,"%s\n", killPlayerString);
+	free(killPlayerString);
 	return;
 }
 
 // Task 9
 void FreePlayer(Player *player)
 {
-	int i, n = player->numberOfLocations;
-
-	for(i = 0; i < n; ++i)
-		free(&player->locations[i]);
 	free(player->locations);
 
 	free(player->hat);

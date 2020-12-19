@@ -57,7 +57,7 @@ for (( i=0; i < TESTS_NUMBER; i++ )); do
 
     valgrindErrors=$?
     errorCode=$(head -n1 test_$i.err)
-    #rm test_$i.*
+    rm test_$i.*
 
 
     printf "|                        Part 1                         |\n"

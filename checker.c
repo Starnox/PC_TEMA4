@@ -285,7 +285,6 @@ int main(int argc, char *argv[])
 	CheckTask6(inputFile, outputFileName);
 	CheckTask7(inputFile, outputFileName);
 	CheckTask8(inputFile, outputFileName);
-	
 
 	free(inputFileName);
 	free(outputFileName);
