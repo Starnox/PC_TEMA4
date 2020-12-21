@@ -7,3 +7,65 @@
 * `RotateMatrix(void *input)` - se aloca dinamic un sir de caractere ce va reprezenta
 sirul returnat la final, iar in doua `for`-uri se construieste fiecare element al 
 sirului prin functia `sprintf()`
+
+### Task2
+* `DecodeString(void *input)` - se converteste inputul in `char *` si prin functia `strtok()`
+avand ca delimitator caracterul '_' se izoleaza numerele, sunt convertite in int si sunt adaugate
+la suma finala care va fi returnata ca sir de caractere
+
+### Task3
+* `Swap(int *a, int *b)` - Se interschimba valorile de la locatiile in memorie a variabilelor a si b
+* `InvertArray(void *input)` - Se verifica mai intai paritatea numarului de elemente, daca este par
+atunci se itereaza vectorul din 2 in 2 si se interschimba elementele (2k + 1, 2k + 2) prin 
+functia `Swap()`, iar daca este impar, se parcurge vectorul pana la jumatate si se interschimba
+elementele situate simetric fata de centru tot prin functia `Swap()`
+
+### Task4
+* `allocPlayer()` - Prima oara se aloca memoria pentru variabila de tip Player(struct),
+dupa care se aloca memorie pentru fiecare dintre atributele care necesita acest lucru.
+Se initializeaza campul `alive` cu 1 si de asemenea se verifica daca alocarile au fost
+realizate in mod corespunzator
+* `allocGame()` - Se aloca memoria pentru variabila de tip Game(struct) si pentru campul name.
+Asemanator cu functia `allocPlayer()` se verifica daca memoria a fost alocata corect
+
+### Task5
+* `SelectRole(Player *player, char *playerRole)` - Se compara stringul primit cu cele
+4 posibilitati prin functia `strcmp()` si se seteaza campul `ability` al variabilei de 
+tip Player primita prin parametru
+* `ReadPlayer(FILE *inputFile)` - Se aloca o variabila de tip Player cu functia `allocPlayer()`,
+dupa care se citeste inputul din fisierul primit pentru fiecare camp specific unui player
+si se initializeaza variabilele cu datele primite 
+* `ReadGame(FILE *inputFile)` - Asemanator cu functia de mai sus, se citeste inputul primit 
+in fisierul `inputFile`, se aloca memorie pentru variabila de tip Game prin functia `allocGame()`
+si sunt initializate variabilele variabilele cu datele corespunzatoare
+
+### Task6
+* `WritePlayer(Player *player, FILE *outputFile)` - se extrage rolul in format de string 
+prin functia `fromEnumtoString()`, se introduc in fisierul de output primit datele playerului
+(`name`, `color`, `hat`, `playerRole`), dupa care sunt introduse in fisier folosind
+formatul specificat si locatile disponibile playerului. 
+* `WriteGame(Game *game, FILE *outputFile)` - Sunt introduse in fisier datele generale ale jocului,
+dupa care pentru fiecare player este apelata functia 'WritePlayer()` si la final este apelata
+si pentru impostor
+
+### Task7
+* `int CalculateDistance(Player *player, Player *impostor)` - calculeaza distanta Manhatan
+intre coordonatele playerul si ale impostorului primiti ca parametrii
+* `void *KillPlayer(void *input)` - Se initializeaza instanta jocului, dupa care se
+itereaza prin toti jucatorii, se calculeaza de la ei la impostor si se alege distanta
+cea mai mica. Daca aceasta distanta este valida, atunci campul `alive` al playerului selectat
+devine 0 si se returneaza stringul aferent. In caz contrar, se returneaza un string de fail
+
+### Task8
+* `void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)` - 
+Se parcurge fiecare jucator, daca nu este in viata atunci este introdus stringul corespunzator,
+insa daca este in viata, se calculeaza noua sa pozitie si se introduce in fiserul de output
+in format corespunzator aceasta noua pozitie si stringul returnat de abilitatea aferenta.
+La final se realizeaza acelas lucru si pentru impostor
+
+### Task9
+* `FreePlayer(Player *player) - se elibereaza fiecare camp care a fost alocat si la final se elibereaza
+si varibila propriu-zisa -> `free()`
+* `FreeGame(Game *game) - se eliberaza datele in ordine inversa modului in care au fost alocate,
+mai intai se elibereaza memoria pentru varibila impostor, dupa care, pentru fiecare jucator
+este apelata functia `FreePlayer()`, si la final sunt dezalocate toate celalate campuri.

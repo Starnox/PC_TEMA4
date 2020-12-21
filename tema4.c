@@ -32,7 +32,7 @@ void *RotateMatrix(void *input)
 	int i, j, n = *((int *) input);
 	char *board = calloc(MAX_LEN_STR_OUT, sizeof(char)), buffer[MAX_LEN_STR_LOC];
 
-	// verifying
+	// Verifying
 	if(board == NULL)
 	{
 		return NULL;
@@ -40,11 +40,15 @@ void *RotateMatrix(void *input)
 	strcpy(board,"");
 	printf("%d",n);
 
+	// Go through every cell 
 	for(i = 1; i <= n; ++i)
 	{
 		for(j = 1; j <= n; ++j)
 		{
+			// Construct each cell with sprintf
 			sprintf(buffer,"%d%d",(n-j+1), (i));
+
+			// Add to the final answer
 			strcat(board,buffer);
 			if(j != n)
 			{
@@ -61,6 +65,7 @@ void *RotateMatrix(void *input)
 // Task 2
 void *DecodeString(void *input)
 {
+	// Declaring and initialising
 	char string[MAX_LEN_STR_LOC], *buffer = calloc(MAX_LEN_STR_LOC, sizeof(char));
 
 	if(buffer == NULL)
@@ -68,24 +73,28 @@ void *DecodeString(void *input)
 		return NULL;
 	}
 
-	// convert into char*
+	// Convert into char*
 	strcpy(string, (char *) input);
 
-	// use strtok to split the string into numbers
+	// Use strtok to split the string into numbers
 	char *ptr = strtok(string, "_");
 	int sum = 0, num;
 
 	while(ptr != NULL)
 	{
+		// Convert into int 
 		num = atoi((const char *) ptr);
+		// Add to the final result
 		sum += num;
 		ptr = strtok(NULL,"_");
 	}
+	// Convert from int to char *
 	sprintf(buffer,"%d",sum);
 
 	return ((void *) buffer);
 }
 
+// Function for swapping two elements
 void Swap(int *a, int *b)
 {
 	int aux = *a;
@@ -96,10 +105,13 @@ void Swap(int *a, int *b)
 //Task 3
 void *InvertArray(void *input)
 {
-	// convert from void* to int*
+	// Convert from void* to int*
 	int *v = (int *) input, i = 1;
+
+	// Declaring and initialising
 	char *res = (char *) malloc(MAX_LEN_STR_LOC * sizeof(char)), 
 			buffer[MAX_LEN_STR_LOC];
+
 	if(res == NULL)
 	{
 		return NULL;
@@ -107,17 +119,19 @@ void *InvertArray(void *input)
 	strcpy(res,"");
 
 	int n = *v;
-	// if it is even
+	// If it is even
 	if(n % 2 == 0)
 	{
 		for(i = 1; i < n; i+=2)
 		{
-			// swap elements (2k+1,2k+2);
+			// Swap elements (2k+1,2k+2);
 			Swap(v+i, v+i+1);
 		}
 	}
 	else
 	{
+		// Iterate through half of the vector and swap each element
+		// with the corresponding one from the other half
 		for(i = 1; i <= n / 2; ++i)
 		{
 			Swap(v+i, v + n - i + 1);
@@ -125,7 +139,8 @@ void *InvertArray(void *input)
 	}
 	for(i = 1; i <= n; ++i)
 	{
-		sprintf(buffer,"%d",*(v+i));
+		// Transform into char * and concatenate to the final answer
+		sprintf(buffer, "%d", *(v+i));
 		strcat(res,buffer);
 		if(i != n)
 			strcat(res, " ");
@@ -134,7 +149,7 @@ void *InvertArray(void *input)
 	return ((void *) res);
 }
 
-
+// Verify the selected role and save the corresponding ability
 void SelectRole(Player *player,char *playerRole)
 {	
 	if(strcmp(playerRole,"Rotator") == 0){
@@ -161,13 +176,18 @@ void SelectRole(Player *player,char *playerRole)
 
 //Task 4
 Player *allocPlayer()
-{
+{	
+	// Allocate memory and verify
 	Player *myPlayer = (Player *) calloc(1, sizeof(Player));
 	if(myPlayer == NULL)
 		return NULL;
+
 	myPlayer->name = (char *)malloc(MAX_LEN_STR_ATR * sizeof(char));
 	myPlayer->color = (char *)malloc(MAX_LEN_STR_ATR * sizeof(char));
 	myPlayer->hat = (char *)malloc(MAX_LEN_STR_ATR * sizeof(char));
+	if(myPlayer->name == NULL || myPlayer->color == NULL || myPlayer->hat == NULL)
+		return NULL;
+
 	myPlayer->alive = 1;
 	return myPlayer;
 }
@@ -175,16 +195,21 @@ Player *allocPlayer()
 //Task 4
 Game *allocGame()
 {
+	// Allocate memory and verify
 	Game *myGame = (Game *) calloc(1, sizeof(Game));
 	if(myGame == NULL)
 		return NULL;
+
 	myGame->name = (char *) malloc(MAX_LEN_STR_ATR * sizeof(char));
+	if(myGame->name == NULL)
+		return NULL;
 	return myGame;
 }
 
 //Task 5
 Player *ReadPlayer(FILE *inputFile)
 {
+	// Allocate the player
 	Player *myPlayer = allocPlayer();
 	if(myPlayer == NULL)
 	{
@@ -196,6 +221,7 @@ Player *ReadPlayer(FILE *inputFile)
 
 	int numOfLocations, i;
 
+	// Read the input and insert the values into each variable
 	fscanf(inputFile,"%s\n",playerName);
 	fscanf(inputFile,"%s\n",color);
 	fscanf(inputFile,"%s\n",hat);
@@ -204,9 +230,14 @@ Player *ReadPlayer(FILE *inputFile)
 	strcpy(myPlayer->name,playerName);
 	strcpy(myPlayer->color,color);
 	strcpy(myPlayer->hat,hat);
-	myPlayer->numberOfLocations = numOfLocations;
-	myPlayer->locations = (Location *) calloc (myPlayer->numberOfLocations, sizeof(Location *));
 
+	myPlayer->numberOfLocations = numOfLocations;
+	myPlayer->locations = (Location *) calloc(myPlayer->numberOfLocations, sizeof(Location));
+	if(myPlayer->locations == NULL)
+		return NULL;
+
+	// For each location, read the input in the specified format
+	// and insert it
 	for(i = 0; i < numOfLocations; ++i)
 	{
 		if(i != numOfLocations - 1)
@@ -214,6 +245,7 @@ Player *ReadPlayer(FILE *inputFile)
 		else
 			fscanf(inputFile,"(%d,%d)",&myPlayer->locations[i].x,&myPlayer->locations[i].y);
 	}
+	// Read the role and select it
 	fscanf(inputFile,"%s",playerRole);
 	SelectRole(myPlayer, playerRole);
 
@@ -223,26 +255,37 @@ Player *ReadPlayer(FILE *inputFile)
 // Task 5
 Game *ReadGame(FILE *inputFile)
 {
+	// Declaration
 	char gameName[MAX_LEN_STR_ATR];
 	int killRange, numCrewmates, i; 
 
+	// Reading
 	fscanf(inputFile,"%s\n",gameName);
 	fscanf(inputFile,"%d\n",&killRange);
 	fscanf(inputFile,"%d\n",&numCrewmates);
 
+	// Allocating memory
 	Game *myGame = allocGame();
+
+
+	// Insert the values
 	strcpy(myGame->name,gameName);
 	myGame->killRange = killRange;
 	myGame->numberOfCrewmates = numCrewmates;
 
+	// Allocate memory for the crewmates
 	myGame->crewmates = (Player **) calloc(numCrewmates, sizeof(Player *));
+	if(myGame->crewmates == NULL)
+		return NULL;
 
 	for(i = 0; i < numCrewmates; ++i)
 	{
+		// Declaring and reading every player
 		Player *newPlayer = ReadPlayer(inputFile);
 		myGame->crewmates[i] = newPlayer;
 	}
 
+	// Declaring and reading the impostor
 	Player *newImpostor = ReadPlayer(inputFile);
 	myGame->impostor = newImpostor;
 	
@@ -252,11 +295,20 @@ Game *ReadGame(FILE *inputFile)
 // Task 6
 void WritePlayer(Player *player, FILE *outputFile)
 {
+	// Trasform from enum to string
 	char *playerRoleString = fromEnumtoString(player->playerRole);
-	fprintf(outputFile,"Player %s with color %s, hat %s and role %s has entered the game.\n",player->name,
-		player->color,player->hat,playerRoleString);
+	if(playerRoleString == NULL)
+	{
+		fprintf(stdout,"ERROR ALLOCATING STRING");
+		return;
+	}
+	// Print in the specified format
+	fprintf(outputFile,"Player %s with color %s, hat %s and role %s has entered the game.\n",
+			player->name,player->color,player->hat,playerRoleString);
 
+	// Free the string
 	free(playerRoleString);
+
 	fprintf(outputFile,"Player's locations: ");
 	for(int i = 0; i < player->numberOfLocations; ++i)
 	{
@@ -269,29 +321,34 @@ void WritePlayer(Player *player, FILE *outputFile)
 // Task 6
 void WriteGame(Game *game, FILE *outputFile)
 {
+	// Print data in the specified format
 	fprintf(outputFile,"Game %s has just started!\n",game->name);
 	fprintf(outputFile,"\tGame options:\n");
 	fprintf(outputFile,"Kill Range: %d\n",game->killRange);
 	fprintf(outputFile,"Number of crewmates: %d\n\n",game->numberOfCrewmates);
 	fprintf(outputFile,"\tCrewmates:\n");
 
+	// Go through each player and write its data to the output file
 	for(int i = 0; i< game->numberOfCrewmates; ++i)
 	{
 		WritePlayer(game->crewmates[i],outputFile);
 	}
 	fprintf(outputFile,"\n");
 	fprintf(outputFile,"\tImpostor:\n");
+	// Write the impostors data
 	WritePlayer(game->impostor,outputFile);
 	return;
 }
 
 int CalculateDistance(Player *player, Player *impostor)
 {
+	// Get the coordonates for the player and the impostor
 	int playerX = player->locations[player->indexOfLocation].x,
 		playerY = player->locations[player->indexOfLocation].y,
 		impostorX = impostor->locations[impostor->indexOfLocation].x,
 		impostorY = impostor->locations[impostor->indexOfLocation].y;
 
+	// Calculate Manhatan distance and return it
 	return (abs(playerX - impostorX) + abs(playerY - impostorY));
 }
 
@@ -299,6 +356,9 @@ int CalculateDistance(Player *player, Player *impostor)
 //Task 7
 void *KillPlayer(void *input)
 {
+	// Declaring and initialising
+
+	// Converting from void* to Game* 
 	Game *myGame = (Game *) input;
 	int i, minDistance = -1, newDistance, killedSomeone = 0;
 	Player *selectedPlayer = NULL;
@@ -306,7 +366,11 @@ void *KillPlayer(void *input)
 	// Go through each of the crewmates
 	for(i = 0; i < myGame->numberOfCrewmates; ++i)
 	{
+		// Calculate the distance to each of the crewmates
 		newDistance = CalculateDistance(myGame->crewmates[i], myGame->impostor);
+
+		// If it is the first valid distance found
+		// valid(the distance is less than or equal to killRange and the player is not dead)
 		if(myGame->crewmates[i]->alive == 1 && minDistance == -1 && newDistance <= myGame->killRange){
 			minDistance = newDistance;
 			selectedPlayer = myGame->crewmates[i];
@@ -314,6 +378,7 @@ void *KillPlayer(void *input)
 		}
 		else
 		{
+			// If the distance is valid and the smallest found so far we update
 			if(myGame->crewmates[i]->alive == 1 && newDistance <= minDistance 
 					&& newDistance <= myGame->killRange)
 			{
@@ -326,11 +391,12 @@ void *KillPlayer(void *input)
 	char *result = (char *) malloc(MAX_LEN_STR_OUT * sizeof(char));
 	if(result == NULL)
 		return NULL;
-	// If no player is in range
+	// If no player is in range or everyone is deadd
 	if(minDistance == -1 || killedSomeone == 0)
 		sprintf(result,"Impostor %s couldn't kill anybody.", myGame->impostor->name);
 	else
 	{
+		// Update the status of the player and construct the result
 		selectedPlayer->alive = 0;
 		sprintf(result,"Impostor %s has just killed crewmate %s from distance %d.",
 			myGame->impostor->name, selectedPlayer->name, minDistance);
@@ -344,8 +410,11 @@ void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)
 {
 	int i, n = game->numberOfCrewmates;
 	Player *currentPlayer;
+
+	// Go through each of the crewmates
 	for(i = 0; i < n; ++i)
 	{
+		// Store the player in a variable
 		currentPlayer = game->crewmates[i];
 		// If the player is alive
 		if(currentPlayer->alive == 1)
@@ -354,6 +423,7 @@ void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)
 			currentPlayer->indexOfLocation = (currentPlayer->indexOfLocation + 1)
 				% currentPlayer->numberOfLocations;
 			
+			// Print the players actions
 			fprintf(outputFile,"Crewmate %s went to location (%d,%d).\n",currentPlayer->name,
 					currentPlayer->locations[currentPlayer->indexOfLocation].x,
 					currentPlayer->locations[currentPlayer->indexOfLocation].y);
@@ -361,11 +431,13 @@ void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)
 			fprintf(outputFile,"Crewmate %s's output:\n",currentPlayer->name);
 			char *abilityString = (char *) currentPlayer->ability(inputMatrix[i]);
 			fprintf(outputFile, "%s\n", abilityString);
+
+			// Free the memory
 			free(abilityString);
 		}
 		else
 		{
-			//Player [nume_jucator] is dead.[\n]
+			// Otherwise it means he is dead
 			fprintf(outputFile,"Crewmate %s is dead.\n",currentPlayer->name);
 		}
 		
@@ -374,13 +446,17 @@ void CalcuateNextCycleOfGame(Game *game, FILE *outputFile, void **inputMatrix)
 	Player *impostor = game->impostor;
 	impostor->indexOfLocation = (impostor->indexOfLocation + 1)
 				% impostor->numberOfLocations;
+
 	fprintf(outputFile,"Impostor %s went to location (%d,%d).\n",impostor->name,
 					impostor->locations[impostor->indexOfLocation].x,
 					impostor->locations[impostor->indexOfLocation].y);
 	fprintf(outputFile,"Impostor %s's output:\n",impostor->name);
+
+	// Get the output string from the KillPlayer function and print it
 	char *killPlayerString = (char *) KillPlayer((void *) game);
 	fprintf(outputFile,"%s\n", killPlayerString);
 	free(killPlayerString);
+
 	return;
 }
 
