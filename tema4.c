@@ -29,8 +29,8 @@ char *fromEnumtoString(PlayerRoles playerRole)
 void *RotateMatrix(void *input)
 {
 	// Declaring and initialising
-	int i, j, n = *((int *) input);
-	char *board = calloc(MAX_LEN_STR_OUT, sizeof(char)), buffer[MAX_LEN_STR_LOC];
+	int i, j, n = *((int *) input), aux = 0, curr = 0;;
+	char *board = (char *) calloc(MAX_LEN_STR_OUT, sizeof(char));
 
 	// Verifying
 	if(board == NULL)
@@ -38,27 +38,27 @@ void *RotateMatrix(void *input)
 		return NULL;
 	}
 	strcpy(board,"");
-	printf("%d",n);
-
+	
+	
 	// Go through every cell 
 	for(i = 1; i <= n; ++i)
 	{
 		for(j = 1; j <= n; ++j)
 		{
+			//aux = (n - j  + 1) * power + i;
 			// Construct each cell with sprintf
-			sprintf(buffer,"%d%d",(n-j+1), (i));
-
-			// Add to the final answer
-			strcat(board,buffer);
 			if(j != n)
-			{
-				strcat(board," ");
-			}
+				aux = sprintf(board + curr,"%d%d ",(n-j+1), (i));
+			else
+				aux = sprintf(board + curr,"%d%d",(n-j+1), (i));
+			curr+= aux;
 		}
-		if(i!= n)
-			strcat(board,"\n");
-	}
+		if(i!= n){
+			sprintf(board + curr,"\n");
+			curr++;
+		}
 
+	}
 	return ((void *) board);
 }
 
